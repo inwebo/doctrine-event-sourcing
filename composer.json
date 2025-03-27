@@ -1,6 +1,16 @@
 {
     "name": "inwebo/doctrine-event-sourcing",
     "description": "Simple Event sourcing pattern implementation with DoctrineListener",
+    "keywords": ["doctrine", "event sourcing", "php8.3"],
+    "homepage": "https://github.com/inwebo/doctrine-event-sourcing",
+    "authors": [
+        {
+            "name": "Inwebo Veritas",
+            "email": "github@inwebo.net",
+            "homepage": "https://www.inwebo.net",
+            "role": "Developer"
+        }
+    ],
     "type": "library",
     "require": {
         "php": "^8.3",
@@ -10,11 +20,9 @@
         "phpunit/phpunit": "^12.0",
         "friendsofphp/php-cs-fixer": "^3.72",
         "phpstan/phpstan": "^2.1",
-        "phpmd/phpmd": "^2.15",
         "symfony/event-dispatcher": "^7.2",
         "symfony/test-pack": "^1.0",
-        "symfony/clock": "^7.2",
-        "phpbench/phpbench": "^1.4"
+        "phpmd/phpmd": "^2.15"
     },
     "license": "GPL-3.0-or-later",
     "autoload": {
@@ -27,12 +35,6 @@
             "Inwebo\\DoctrineEventSourcing\\Tests\\": "tests/"
         }
     },
-    "authors": [
-        {
-            "name": "Inwebo",
-            "email": "github@inwebo.net"
-        }
-    ],
     "scripts": {
         "php-cs-fixer": "vendor/bin/php-cs-fixer --allow-risky=yes fix",
         "phpunit": "vendor/bin/phpunit --testdox",

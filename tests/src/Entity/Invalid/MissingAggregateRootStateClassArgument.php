@@ -8,11 +8,8 @@ use Inwebo\DoctrineEventSourcing\Mapping\AggregateRoot;
 use Inwebo\DoctrineEventSourcing\Model\Interface\HasStatesInterface;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\EventSourcingStatesTrait;
 
-/**
- * Test Unknown stateClass.
- */
-#[AggregateRoot(stateClass: UnknowState::class)]
-class InvalidStateClass implements HasStatesInterface
+#[AggregateRoot(subjectSetter: 'setFoo')]
+class MissingAggregateRootStateClassArgument implements HasStatesInterface
 {
     use EventSourcingStatesTrait;
 }

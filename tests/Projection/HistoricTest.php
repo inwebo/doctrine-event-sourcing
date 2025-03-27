@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Inwebo\DoctrineEventSourcing\Tests\Projection;
 
-use Inwebo\DoctrineEventSourcing\Model\EventSourcing;
-use Inwebo\DoctrineEventSourcing\Model\MetaDataFactory;
+use Inwebo\DoctrineEventSourcing\Model\Aggregator;
+use Inwebo\DoctrineEventSourcing\Model\Interface\HasStatesInterface;
 use Inwebo\DoctrineEventSourcing\Resolver\HistoricResolver;
-use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Person\Person;
-use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Person\PersonState;
+use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Foo\Foo;
+use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Foo\FooState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -16,26 +16,25 @@ use PHPUnit\Framework\TestCase;
 class HistoricTest extends TestCase
 {
     private HistoricResolver $historic;
+    private HasStatesInterface $subject;
 
     public function setUp(): void
     {
         // Actual State
-        $subject = new Person('Georges', 'Pompidou');
-        $states = [
-            // Created
-            new PersonState('Albert', 'Lebrun'),
-            new PersonState('Vincent', 'Auriol'),
-            new PersonState('René', 'Cotty'),
-            new PersonState('Charles', 'De Gaulle'),
-        ];
-        $subject->setEventSourcingStates($states);
+        $subject = new Foo('Georges', 'Pompidou', new \DateTime());
 
-        $this->historic = new HistoricResolver(EventSourcing::new($subject));
+        $subject->getEventSourcingStates()->add(new FooState('Albert', 'Lebrun'));
+        $subject->getEventSourcingStates()->add(new FooState('Vincent', 'Auriol'));
+        $subject->getEventSourcingStates()->add(new FooState('René', 'Cotty'));
+        $subject->getEventSourcingStates()->add(new FooState('Charles', 'De Gaulle'));
+        $this->subject = $subject;
+
+        $this->historic = new HistoricResolver(Aggregator::new(get_class($subject)));
     }
 
     public function testHistoric(): void
     {
-        $changeSet = $this->historic->resolve();
+        $changeSet = $this->historic->resolve($this->subject);
 
         $this->assertNotEmpty($changeSet);
         $this->assertCount(5, $changeSet->get());
