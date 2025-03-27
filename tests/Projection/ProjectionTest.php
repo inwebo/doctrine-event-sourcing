@@ -54,6 +54,6 @@ class ProjectionTest extends TestCase
         $criteria->orderBy(['discountEnd' => Order::Ascending]);
         /** @var Product $subject */
         $subject = $this->projection->matching($criteria);
-        $this->assertEquals('Foo summer last discount', $subject->getName());
+        $this->assertEquals('Baz Will be discounted', $subject->getName());
     }
 }
