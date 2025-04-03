@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace Inwebo\DoctrineEventSourcing\Tests\Projection;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Order;
 use Inwebo\DoctrineEventSourcing\Model\EventSourcing;
-use Inwebo\DoctrineEventSourcing\Model\MetaDataFactory;
 use Inwebo\DoctrineEventSourcing\Resolver\ProjectionResolver;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Product\Product;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Product\ProductState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Clock\MockClock;
 
 #[CoversClass(ProjectionResolver::class)]
 class ProjectionTest extends TestCase

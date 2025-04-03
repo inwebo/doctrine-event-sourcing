@@ -24,22 +24,22 @@ readonly class EventSourcing
     }
 
     /**
-     * Apply a StateInterface to a subject.
+     * Apply State's values to a subject.
      *
      * @throws \ReflectionException
      */
     public function applyState(HasStatesInterface $subject, StateInterface $state): HasStatesInterface
     {
-        foreach ($this->getMetaDataFactory()->getMetadata() as $metaDataDto) {
-            $value = $metaDataDto->invokeStateGetter($state);
-            $metaDataDto->invokeSubjectSetter($subject, $value);
+        foreach ($this->getMetaDataFactory()->getMetadata() as $metaData) {
+            $value = $metaData->invokeStateGetter($state);
+            $metaData->invokeSubjectSetter($subject, $value);
         }
 
         return $subject;
     }
 
     /**
-     * Create a new state instance from a subject's mapping.
+     * Create a new state from a subject's mapping current values.
      */
     public function createState(HasStatesInterface $subject): StateInterface
     {
@@ -50,11 +50,13 @@ readonly class EventSourcing
             $metaData->invokeStateSetter($state, $value);
         }
 
+        $state->setSubject($subject);
+
         return $state;
     }
 
     /**
-     * Create a new state value from the doctrine pre update hook with its PreUpdateEventArgs argument changeSet.
+     * Create a new state value from the doctrine pre update hook with its PreUpdateEventArgs argument changeSet values.
      */
     public function createFromChange(PreUpdateEventArgs $args): StateInterface
     {

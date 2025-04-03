@@ -19,39 +19,29 @@ abstract class AbstractStoreListener implements StoreListenerInterface
 {
     private static bool $hasBeenUpdated = false;
 
-    public static function hasBeenUpdated(): bool
-    {
-        return self::$hasBeenUpdated;
-    }
-
-    public function setUpdated(bool $updated): void
-    {
-        self::$hasBeenUpdated = $updated;
-    }
-
     public function prePersist(HasStatesInterface $subject, PrePersistEventArgs $args): void
     {
-        $factory = EventSourcing::new($subject);
-        $state = $factory->createState($subject);
-        $subject->getEventSourcingStates()->add($state);
+        if (true === self::$hasBeenUpdated) {
+            return;
+        }
+        self::$hasBeenUpdated = true;
+        $eventSourcing = EventSourcing::new($subject);
+        $state = $eventSourcing->createState($subject);
 
-        $args->getObjectManager()->persist($state);
-        $args->getObjectManager()->flush();
+        $subject->getEventSourcingStates()->add($state);
     }
 
     public function preUpdate(HasStatesInterface $subject, PreUpdateEventArgs $args): void
     {
-        if (true === static::hasBeenUpdated()) {
+        if (true === self::$hasBeenUpdated) {
             return;
         }
+        self::$hasBeenUpdated = true;
+        $eventSourcing = EventSourcing::new($subject);
+        $state = $eventSourcing->createFromChange($args);
 
-        $factory = EventSourcing::new($subject);
-        $state = $factory->createFromChange($args);
         $subject->getEventSourcingStates()->add($state);
-
         $args->getObjectManager()->persist($state);
         $args->getObjectManager()->flush();
-
-        $this->setUpdated(true);
     }
 }

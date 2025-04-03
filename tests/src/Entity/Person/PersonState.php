@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Inwebo\DoctrineEventSourcing\Tests\src\Entity\Person;
 
 use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
+use Inwebo\DoctrineEventSourcing\Tests\src\Entity\SubjectTrait;
 
 class PersonState implements PersonInterface, StateInterface
 {
+    use SubjectTrait;
+
     public function __construct(
         private ?string $firstName = null,
         private ?string $lastName = null,

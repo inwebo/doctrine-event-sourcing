@@ -112,7 +112,7 @@ class MetaDataFactory
     }
 
     /**
-     * @throws EventSource\MissingAttributeException If subject methods are not annotated with method attribute #[Mapping\EventSource]
+     * @throws EventSource\MissingAttributeException If subject methods are not annotated with method's attribute #[Mapping\EventSource]
      * @throws EventSource\PropertyArgumentException If subject property defined in #[Mapping\EventSource] doesn't exist in subject
      * @throws EventSource\MethodArgumentException   If subject method defined in #[Mapping\EventSource] doesn't exist in subject
      * @throws EventSource\MethodArgumentException   If state method defined in #[Mapping\EventSource] doesn't exist in state
@@ -121,6 +121,7 @@ class MetaDataFactory
     {
         $metaData = new ArrayCollection();
         $methods = $this->getReflection()->getMethods();
+
         foreach ($methods as $method) {
             $attributes = $method->getAttributes(Mapping\EventSource::class);
 
@@ -139,7 +140,6 @@ class MetaDataFactory
                 } catch (\ReflectionException $e) {
                     throw new EventSource\PropertyArgumentException($this->getSubject(), $method->getName(), $propertyArgument); // @phpstan-ignore argument.type
                 }
-
                 try {
                     $stateGetter = new \ReflectionMethod($this->getStateClass(), $methodArgument); // @phpstan-ignore argument.type
                 } catch (\ReflectionException $e) {
@@ -150,15 +150,16 @@ class MetaDataFactory
                 } catch (\ReflectionException $e) {
                     throw new EventSource\MethodArgumentException($this->getSubject()::class, $method->getName(), $methodArgument); // @phpstan-ignore argument.type
                 }
-
                 try {
                     $stateSetter = new \ReflectionMethod($this->getStateClass(), $method->getName());
                 } catch (\ReflectionException $e) {
                     throw new EventSource\MethodArgumentException($this->getStateClass(), $method->getName(), $methodArgument); // @phpstan-ignore argument.type
                 }
 
+                $subjectSetter = $method;
+
                 $metaData->add(new MetaDataDto(
-                    $method,
+                    $subjectSetter,
                     $subjectGetter,
                     $stateGetter,
                     $stateSetter,

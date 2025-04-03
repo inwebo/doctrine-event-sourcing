@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Inwebo\DoctrineEventSourcing\Tests\Projection;
 
 use Inwebo\DoctrineEventSourcing\Model\EventSourcing;
-use Inwebo\DoctrineEventSourcing\Model\MetaDataFactory;
 use Inwebo\DoctrineEventSourcing\Resolver\HistoricResolver;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Person\Person;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Person\PersonState;

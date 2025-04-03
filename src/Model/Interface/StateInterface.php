@@ -9,4 +9,5 @@ namespace Inwebo\DoctrineEventSourcing\Model\Interface;
  */
 interface StateInterface
 {
+    public function setSubject(mixed $subject): void;
 }

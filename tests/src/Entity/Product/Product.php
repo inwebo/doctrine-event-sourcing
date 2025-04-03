@@ -40,7 +40,6 @@ class Product implements HasStatesInterface, ProductInterface
         return $this->price;
     }
 
-
     public function getDiscountStart(): ?\DateTimeInterface
     {
         return $this->discountStart;

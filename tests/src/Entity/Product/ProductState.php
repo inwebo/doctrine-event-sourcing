@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Inwebo\DoctrineEventSourcing\Tests\src\Entity\Product;
 
 use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
+use Inwebo\DoctrineEventSourcing\Tests\src\Entity\SubjectTrait;
 
 class ProductState implements ProductInterface, StateInterface
 {
+    use SubjectTrait;
+
     public function __construct(
         private string $name,
         private float $price,

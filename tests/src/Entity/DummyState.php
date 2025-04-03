@@ -8,4 +8,5 @@ use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
 
 class DummyState implements StateInterface
 {
+    use SubjectTrait;
 }
