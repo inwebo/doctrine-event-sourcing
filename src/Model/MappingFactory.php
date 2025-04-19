@@ -11,6 +11,7 @@ use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateRoot\Missing\Attribu
 use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateRoot\Missing\StateClassArgumentException;
 use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateRoot\Missing\SubjectSetterException;
 use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateSource\Invalid\GetterException;
+use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateSource\Invalid\SetterException;
 use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateSource\Missing\GetterArgumentException;
 use Inwebo\DoctrineEventSourcing\Exception\Mapping\AggregateSource\Missing\SetterArgumentException;
 use Inwebo\DoctrineEventSourcing\Exception\MissingHasStatesInterfaceException;
@@ -20,8 +21,14 @@ use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
 use Inwebo\DoctrineEventSourcing\Model\Mapping as MappingDto;
 
 /**
- * This class ensure that a subject's mapping is correctly configured.
- * The Mapping configuration is represented by a collection of Mapping objects.
+ * Factory class responsible for creating and managing mappings between aggregate roots and their states.
+ * It analyzes class attributes and relationships to establish property mappings and validate class structures.
+ *
+ * This class handles:
+ * - Validation of aggregate root and source attributes
+ * - Mapping of getters and setters between subject and state classes
+ * - Creation and management of property mappings
+ * - Verification of required interfaces and class relationships
  */
 class MappingFactory
 {
@@ -46,18 +53,22 @@ class MappingFactory
     protected \ReflectionMethod $subjectSetter;
 
     /**
-     * @param class-string $subjectClass
+     * Creates a new MappingFactory instance for the given subject class.
+     * Validates the class structure and establishes mappings between the subject and its state class.
      *
-     * @throws \ErrorException                    If subject class is Unknown
-     * @throws AttributeException                 If subject is not annotated with #[AggregateRoot]
+     * @param class-string $subjectClass The fully qualified class name of the subject to be mapped
+     *
+     * @throws \ErrorException                    If the subject class is Unknown
+     * @throws AttributeException                 If the subject is not annotated with #[AggregateRoot]
      * @throws SetterArgumentException            If #[AggregateRoot] stateClass is missing
      * @throws GetterException                    If a getter is missing in subjectClass or stateClass
+     * @throws SetterException                    If a setter is unknown
      * @throws GetterArgumentException            If #[AggregateSource] getter argument is missing
      * @throws StateClassArgumentException        If #[AggregateRoot] stateClass is missing
      * @throws SubjectSetterException             If #[AggregateRoot] subjectSetter argument is missing
      * @throws StateClassException                If #[AggregateRoot] stateClass argument is invalid
      * @throws Invalid\SubjectSetterException     If #[AggregateRoot] subjectSetter argument is invalid
-     * @throws MissingHasStatesInterfaceException If subject class doesn't implement HasStatesInterface
+     * @throws MissingHasStatesInterfaceException If the subject class doesn't implement HasStatesInterface
      * @throws \ReflectionException               Is never thrown
      */
     public function __construct(string $subjectClass)
@@ -70,9 +81,12 @@ class MappingFactory
     }
 
     /**
-     * @param class-string $subjectClass
+     * Sets and validates the subject class, ensuring it implements the required interface.
      *
-     * @throws MissingHasStatesInterfaceException|\ErrorException
+     * @param class-string $subjectClass The FQCN of the subject class
+     *
+     * @throws MissingHasStatesInterfaceException If the class doesn't implement HasStatesInterface
+     * @throws \ErrorException                    If the class doesn't exist
      */
     protected function setSubjectClass(string $subjectClass): void
     {
@@ -88,24 +102,35 @@ class MappingFactory
         }
     }
 
+    /**
+     * Returns the reflection method for setting the subject on the state class.
+     */
     public function getSubjectSetter(): \ReflectionMethod
     {
         return $this->subjectSetter;
     }
 
     /**
-     * @return class-string
+     * Returns the fully qualified class name of the subject.
+     *
+     * @return class-string The FQCN of the subject class
      */
     public function getSubjectClass(): string
     {
         return $this->subjectClass;
     }
 
+    /**
+     * Returns the fully qualified class name of the state class.
+     */
     public function getStateClass(): string
     {
         return $this->stateClass;
     }
 
+    /**
+     * Creates and returns a new instance of the state class.
+     */
     public function newStateClass(): StateInterface
     {
         /** @var StateInterface $stateClass */
@@ -117,12 +142,22 @@ class MappingFactory
     /**
      * @return \ReflectionClass<object>
      */
+    /**
+     * Returns the reflection class instance for the subject class.
+     *
+     * @return \ReflectionClass<object>
+     */
     public function getSubjectReflectionClass(): \ReflectionClass
     {
         return $this->subjectReflectionClass;
     }
 
     /**
+     * @return ArrayCollection<int, MappingDto>
+     */
+    /**
+     * Returns the collection of mappings between subject and state properties.
+     *
      * @return ArrayCollection<int, MappingDto>
      */
     public function getMapping(): ArrayCollection
@@ -136,6 +171,16 @@ class MappingFactory
      * @throws StateClassArgumentException
      * @throws StateClassException
      * @throws SubjectSetterException
+     */
+    /**
+     * Processes and validates the AggregateRoot attribute on the subject class.
+     * Sets up the state class and subject setter configurations.
+     *
+     * @throws AttributeException             If the AggregateRoot attribute is missing
+     * @throws Invalid\SubjectSetterException If the subject setter is invalid
+     * @throws StateClassArgumentException    If the state class argument is missing
+     * @throws StateClassException            If the state class is invalid
+     * @throws SubjectSetterException         If the subject setter is missing
      */
     protected function setAggregateRoot(): void
     {
@@ -172,6 +217,19 @@ class MappingFactory
         }
     }
 
+    /**
+     * Processes and validates AggregateSource attributes on subject class properties.
+     * Sets up mappings between subject and state properties, including their getters and setters.
+     *
+     * Iterates through all properties of the subject class, looking for those annotated with #[AggregateSource].
+     * For each annotated property, it validates and creates mappings for the getter and setter methods
+     * in both the subject and state classes.
+     *
+     * @throws GetterArgumentException If the getter method name is missing in the attribute
+     * @throws SetterArgumentException If the setter method name is missing in the attribute
+     * @throws GetterException         If the getter method doesn't exist in either subject or state class
+     * @throws SetterException         If the setter method doesn't exist in either subject or state class
+     */
     public function setAggregateSource(): void
     {
         foreach ($this->getSubjectReflectionClass()->getProperties() as $property) {
@@ -204,12 +262,12 @@ class MappingFactory
                 try {
                     $subjectSetterMethod = $this->getMutator($this->getSubjectClass(), $setterMethodName);
                 } catch (\ReflectionException $e) {
-                    throw new GetterException($this->getSubjectClass(), $property->getName(), $getterMethodName, $setterMethodName);
+                    throw new SetterException($this->getSubjectClass(), $property->getName(), $getterMethodName, $setterMethodName);
                 }
                 try {
                     $stateSetterMethod = $this->getMutator($this->getStateClass(), $setterMethodName);
                 } catch (\ReflectionException $e) {
-                    throw new GetterException($this->getStateClass(), $property->getName(), $getterMethodName, $setterMethodName);
+                    throw new SetterException($this->getStateClass(), $property->getName(), $getterMethodName, $setterMethodName);
                 }
 
                 $this->mapping->add(
@@ -226,7 +284,9 @@ class MappingFactory
     }
 
     /**
-     * @throws \ReflectionException
+     * Creates a ReflectionMethod instance for the specified class and method.
+     *
+     * @throws \ReflectionException If the method doesn't exist
      */
     protected function getMutator(string $fqcnClass, string $methodName): \ReflectionMethod
     {

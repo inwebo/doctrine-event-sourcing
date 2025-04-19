@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MappingFactory::class)]
 #[Group('Mapping')]
-class AggregateSourceTest extends TestCase
+class SubjectMutatorTest extends TestCase
 {
     public function testMissingGetterArgument(): void
     {
