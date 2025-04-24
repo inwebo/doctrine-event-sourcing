@@ -17,14 +17,8 @@ use Inwebo\DoctrineEventSourcing\Model\Interface\StoreListenerInterface;
  */
 abstract class AbstractStoreListener implements StoreListenerInterface
 {
-    private bool $hasBeenUpdated = false;
-
     public function prePersist(HasStatesInterface $subject, PrePersistEventArgs $args): void
     {
-        if (true === $this->hasBeenUpdated) {
-            return;
-        }
-        $this->hasBeenUpdated = true;
         $aggregator = Aggregator::new(get_class($subject));
         $state = $aggregator->createState($subject);
 
@@ -33,10 +27,6 @@ abstract class AbstractStoreListener implements StoreListenerInterface
 
     public function preUpdate(HasStatesInterface $subject, PreUpdateEventArgs $args): void
     {
-        if (true === $this->hasBeenUpdated) {
-            return;
-        }
-        $this->hasBeenUpdated = true;
         $aggregator = Aggregator::new(get_class($subject));
         $state = $aggregator->createStateFromChange($args);
 
