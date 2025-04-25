@@ -88,4 +88,45 @@ class AggregatorTest extends TestCase
         $this->assertEquals($state2->getFirstName(), $appliedStates->getFirstName());
         $this->assertEquals($state2->getLastName(), $appliedStates->getLastName());
     }
+
+    public function testHistoric(): void
+    {
+        $birthDate = new \DateTime(); /** php-stan */
+        $state1 = new FooState();
+        $state1->setFirstName('oof');
+        $state1->setLastName('rab');
+        $state1->setBirthDate($birthDate);
+        $this->subject->getEventSourcingStates()->add($state1);
+        // oof, bar
+
+        $state2 = new FooState();
+        $state2->setFirstName(null);
+        $state2->setLastName('Chirac');
+        $state2->setBirthDate($birthDate);
+        $this->subject->getEventSourcingStates()->add($state2);
+        // oof, Chirac
+
+        $state2 = new FooState();
+        $state2->setFirstName('foo');
+        $state2->setLastName('bar');
+        $state2->setBirthDate($birthDate);
+        $this->subject->getEventSourcingStates()->add($state2);
+        // foo, bar
+
+        $historic = $this->aggregator->historic($this->subject);
+
+        $this->assertCount(3, $historic);
+
+        $this->assertEquals('oof', $historic[0]->getFirstName());
+        $this->assertEquals('rab', $historic[0]->getLastName());
+        $this->assertCount(0, $historic[0]->getEventSourcingStates());
+
+        $this->assertEquals('oof', $historic[1]->getFirstName());
+        $this->assertEquals('Chirac', $historic[1]->getLastName());
+        $this->assertCount(1, $historic[1]->getEventSourcingStates());
+
+        $this->assertEquals('foo', $historic[2]->getFirstName());
+        $this->assertEquals('bar', $historic[2]->getLastName());
+        $this->assertCount(2, $historic[2]->getEventSourcingStates());
+    }
 }

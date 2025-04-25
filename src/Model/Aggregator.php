@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Inwebo\DoctrineEventSourcing\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Inwebo\DoctrineEventSourcing\Model\Interface\HasStatesInterface;
 use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
@@ -125,6 +126,37 @@ readonly class Aggregator
         }
 
         return $this->createState($subject);
+    }
+
+    /**
+     * @return array<int, HasStatesInterface>
+     */
+    public function historic(HasStatesInterface $subject): array
+    {
+        $historic = [];
+
+        $clone = null;
+        $states = null;
+        $previousState = null;
+        foreach ($subject->getEventSourcingStates() as $state) {
+            $clone = (true === is_null($clone)) ? clone $subject : clone $clone;
+            $newState = $this->applyState($clone, $state);
+
+            if (is_null($states)) {
+                $states = new ArrayCollection();
+            } else {
+                $states = clone $states;
+                $states->add($previousState);
+            }
+
+            $newState->setEventSourcingStates($states);
+
+            $historic[] = $newState;
+
+            $previousState = $state;
+        }
+
+        return $historic;
     }
 
     /**

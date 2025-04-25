@@ -16,4 +16,9 @@ interface HasStatesInterface
      * @return ArrayCollection<int, StateInterface>
      */
     public function getEventSourcingStates(): Collection;
+
+    /**
+     * @param Collection<int, StateInterface> $states
+     */
+    public function setEventSourcingStates(Collection $states): void;
 }

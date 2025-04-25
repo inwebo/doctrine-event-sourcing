@@ -10,7 +10,7 @@ use Inwebo\DoctrineEventSourcing\Model\Dto\ChangeSetDto;
 use Inwebo\DoctrineEventSourcing\Model\Interface\HasStatesInterface;
 use Inwebo\DoctrineEventSourcing\Model\Interface\StateInterface;
 
-class HistoricResolver
+class DiffResolver
 {
     public function __construct(protected Aggregator $aggregator)
     {

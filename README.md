@@ -34,7 +34,7 @@ Simple Event sourcing pattern implementation with DoctrineListener
 * **[StoreListener](./src/Listener/StoreListener.php)**: A Doctrine Entity Listener (e.g., StoreListener) that hooks into prePersist and preUpdate events. It uses the Aggregator to create and persist new State entities whenever an Aggregate Root is created or modified.
 * **[MappingFactory](./src/Model/MappingFactory.php)**: Responsible for parsing the #[AggregateRoot] and #[AggregateSource] attributes on a subject class, validating the configuration, and creating Mapping objects that define how properties are transferred between the subject and its state.
 * **[MappingFactory](./src/Model/Aggregator.php)**: Uses the mapping information provided by MappingFactory to create new State entities from an Aggregate Root or apply a specific State back onto an Aggregate Root.
-* **[HistoricResolver](./src/Resolver/HistoricResolver.php)**: Enables querying the history of changes for an Aggregate Root by comparing consecutive State entities.
+* **[HistoricResolver](src/Resolver/DiffResolver.php)**: Enables querying the history of changes for an Aggregate Root by comparing consecutive State entities.
 
 ## Setup and Usage
 

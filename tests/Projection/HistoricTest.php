@@ -6,16 +6,16 @@ namespace Inwebo\DoctrineEventSourcing\Tests\Projection;
 
 use Inwebo\DoctrineEventSourcing\Model\Aggregator;
 use Inwebo\DoctrineEventSourcing\Model\Interface\HasStatesInterface;
-use Inwebo\DoctrineEventSourcing\Resolver\HistoricResolver;
+use Inwebo\DoctrineEventSourcing\Resolver\DiffResolver;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Foo\Foo;
 use Inwebo\DoctrineEventSourcing\Tests\src\Entity\Foo\FooState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(HistoricResolver::class)]
+#[CoversClass(DiffResolver::class)]
 class HistoricTest extends TestCase
 {
-    private HistoricResolver $historic;
+    private DiffResolver $historic;
     private HasStatesInterface $subject;
 
     public function setUp(): void
@@ -29,7 +29,7 @@ class HistoricTest extends TestCase
         $subject->getEventSourcingStates()->add(new FooState('Charles', 'De Gaulle'));
         $this->subject = $subject;
 
-        $this->historic = new HistoricResolver(Aggregator::new(get_class($subject)));
+        $this->historic = new DiffResolver(Aggregator::new(get_class($subject)));
     }
 
     public function testHistoric(): void

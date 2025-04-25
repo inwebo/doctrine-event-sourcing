@@ -80,4 +80,12 @@ class Foo implements HasStatesInterface
     {
         return $this->states;
     }
+
+    /**
+     * @param ArrayCollection<int, StateInterface> $states
+     */
+    public function setEventSourcingStates(Collection $states): void
+    {
+        $this->states = $states;
+    }
 }

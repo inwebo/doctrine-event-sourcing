@@ -18,4 +18,12 @@ trait EventSourcingStatesTrait
     {
         return $this->states;
     }
+
+    /**
+     * @param ArrayCollection $states
+     */
+    public function setEventSourcingStates(Collection $states): void
+    {
+        $this->states = $states;
+    }
 }
